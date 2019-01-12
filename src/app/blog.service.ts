@@ -24,16 +24,16 @@ export class BlogService {
     const url = `${this.blogUrl}/Token`;
 
     // Service errors with HTTP 400 because credentials are invalid.
-    return this.http.post<LoginResult | LoginError>(url, loginData, httpOptions)
+    return this.http.post<LoginResult>(url, loginData, httpOptions)
       .pipe (
-        catchError(this.handleError<LoginError>('login', new LoginError))
+        catchError(this.handleError<LoginError>('login'))
       );
   }
 
-  private handleError<T> (operation = 'operation', result?: T) {
+  private handleError<T> (operation = 'operation') {
     return (error: any): Observable<T> => {
       console.error(error);
-      return of(result as T);
-    }
+      return of(error.error as T);
+    };
   }
 }

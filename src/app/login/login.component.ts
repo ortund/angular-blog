@@ -11,8 +11,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
 
-   result: string;
-   returnUrl: string = "";
+  result: string;
+  returnUrl: string = "";
 
   constructor(private route: ActivatedRoute, private router: Router, private blogService: BlogService) { }
 
@@ -22,11 +22,10 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  login(emailAddress: string, password: string): void {    
+  login(emailAddress: string, password: string): void {
     this.blogService.login(emailAddress, password)
-      .subscribe((result: any) => {
-        console.log(result);
-        if (result.hasOwnProperty("access_token")) {
+      .subscribe((result: LoginResult | LoginError) => {
+        if (this.isLoginResult(result)) {
           if (this.returnUrl != "") {
             this.router.navigate([this.returnUrl]);
           }
@@ -35,7 +34,7 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/']);
           }
         }
-        else if (result.hasOwnProperty("error")) {
+        else if (this.isLoginError(result)) {
           this.result = result.error_description;
         }
         else
@@ -43,5 +42,14 @@ export class LoginComponent implements OnInit {
           this.result = "Unknown login result.";
         }
       })
+  }
+
+  // https://stackoverflow.com/questions/43894565/cast-object-to-interface-in-typescript
+  private isLoginResult(obj: any): obj is LoginResult {
+    return obj && typeof obj.access_token === "string";
+  }
+
+  private isLoginError(obj: any): obj is LoginError {
+    return obj && typeof obj.error_description === "string";
   }
 }
