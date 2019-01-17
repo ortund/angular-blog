@@ -31,8 +31,9 @@ export class BlogService {
     // Get the user
     const data = "username=" + username;
 
-    const url = `${this.blogUrl}/api/Users/Get`;
-    return this.http.post<User>(url, data, httpOptions);
+    // TODO: Remove trailing characters put there to force an error on the service. 
+    const url = `${this.blogUrl}/api/Users/?${data}ryjr`;
+    return this.http.get<User>(url);
   }
 
   setAuthHeaders() : void {

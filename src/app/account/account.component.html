@@ -1,5 +1,8 @@
 <p>
   account works!
-
-  {{cookie}}
 </p>
+
+<div *ngIf="err">
+  <h4>{{err.error}}</h4>
+  <p>{{err.error_description}}</p>
+</div>

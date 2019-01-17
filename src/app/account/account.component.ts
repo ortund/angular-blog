@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BlogService } from '../blog.service';
 import { CookieService } from 'ngx-cookie-service';
 import { User } from '../models/bloguser';
+import { ServiceError } from '../models/service-error';
 
 @Component({
   selector: 'app-account',
@@ -13,6 +14,7 @@ export class AccountComponent implements OnInit {
   constructor(private router: Router, private blogService: BlogService, private cookieService: CookieService) { }
 
   user: User;
+  err: ServiceError;
 
   ngOnInit() {
     // Read auth cookie to determine if the user is logged in or not.
@@ -33,9 +35,14 @@ export class AccountComponent implements OnInit {
       this.user = result;
     },
     (error: any) => {
-      // Most likely the session expired, route back to login.
-      // This probably shouldn't ever happen though.
-      console.log(error);
+      if (this.isServiceError(error))
+      {
+        this.err = error;
+      }
     })
+  }
+
+  private isServiceError(obj: any) : obj is ServiceError {
+    return obj && typeof obj.error_description === "string";
   }
 }

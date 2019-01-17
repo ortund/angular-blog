@@ -1,5 +1,7 @@
 export class User {
-    Id: string; // uses a guid
+    BlogName: string;
+    Url: string;
+    LogoImagePath: string;
     Email: string;
-    Password: string;
+    UserName: string;
 }
