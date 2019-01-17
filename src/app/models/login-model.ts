@@ -1,12 +1,12 @@
 export class LoginModel {
-    GrantType: string;
-    Username: string;
-    Password: string;
+    grant_type: string;
+    username: string;
+    password: string;
 
     constructor (grantType: string, user: string, pass: string)
     {
-        this.GrantType = grantType;
-        this.Username = user;
-        this.Password = pass;
+        this.grant_type = grantType;
+        this.username = user;
+        this.password = pass;
     }
 }

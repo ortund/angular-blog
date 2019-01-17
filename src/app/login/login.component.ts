@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { BlogService } from '../blog.service';
-import { LoginResult } from '../models/login-result';
 import { LoginError } from '../models/login-error';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -25,6 +24,7 @@ export class LoginComponent implements OnInit {
   login(emailAddress: string, password: string): void {
     this.blogService.login(emailAddress, password)
       .subscribe(result => {
+          sessionStorage.setItem("shmooToken", result.access_token);
           if (this.returnUrl != "") {
             this.router.navigate([this.returnUrl]);
           }
@@ -32,8 +32,15 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/']);
           }
         },
-        error => {
-          this.result = "Invalid user login.";
+        (error: any) => {
+          if (this.isLoginError(error))
+          {
+            this.result = error.error_description;
+          }
+          else
+          {
+            this.result = "Invalid user login.";
+          }
         }
       )
   }
@@ -43,7 +50,7 @@ export class LoginComponent implements OnInit {
   //  return obj && typeof obj.access_token === "string";
   //}
 
-  //private isLoginError(obj: any): obj is LoginError {
-  //  return obj && typeof obj.error_description === "string";
-  //}
+  private isLoginError(obj: any): obj is LoginError {
+    return obj && typeof obj.error_description === "string";
+  }
 }
