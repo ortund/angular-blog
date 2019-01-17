@@ -21,6 +21,8 @@
       <div class="login-card-wide mdl-card mdl-shadow--2dp">
 
         <div class="mdl-card__title">
+        <div class="mdl-spinner mdl-js-spinner"></div>
+
           <h2 class="mdl-card__title-text">Log In</h2>
         </div>
 
@@ -42,9 +44,15 @@
         </div>
 
         <div class="mdl-card__actions mdl-card--border">
-          <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" (click)="login(emailAddress.value, password.value)">Log In</button>
+          <button class="login mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" (click)="login(emailAddress.value, password.value)">Log In</button>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  $(".login").on("click", function () {
+    $(".mdl-spinner").addClass("is-active");
+  });
+</script>

@@ -1,7 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
+
 import { BlogService } from '../blog.service';
-import { LoginError } from '../models/login-error';
+import { CookieService} from 'ngx-cookie-service';
+
+import { ServiceError } from '../models/service-error';
 import { Router, ActivatedRoute } from '@angular/router';
+import { LoginResult } from '../models/login-result';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +17,7 @@ export class LoginComponent implements OnInit {
   result: string;
   returnUrl: string = "";
 
-  constructor(private route: ActivatedRoute, private router: Router, private blogService: BlogService) { }
+  constructor(private route: ActivatedRoute, private router: Router, private blogService: BlogService, private cookieService: CookieService) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -21,28 +25,37 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  login(emailAddress: string, password: string): void {
+  login(emailAddress: string, password: string) : void {
     this.blogService.login(emailAddress, password)
-      .subscribe(result => {
-          sessionStorage.setItem("shmooToken", result.access_token);
-          if (this.returnUrl != "") {
-            this.router.navigate([this.returnUrl]);
-          }
-          else {
-            this.router.navigate(['/']);
-          }
-        },
-        (error: any) => {
-          if (this.isLoginError(error))
-          {
-            this.result = error.error_description;
-          }
-          else
-          {
-            this.result = "Invalid user login.";
-          }
-        }
-      )
+    .subscribe(result => {
+      this.setAuthData(result);
+
+      if (this.returnUrl != "") {
+        this.router.navigate([this.returnUrl]);
+      }
+      else {
+        this.router.navigate(['/']);
+      }
+    },
+    (error: any) => {
+      if (this.isServiceError(error))
+      {
+        this.result = error.error_description;
+      }
+      else
+      {
+        this.result = "Invalid user login.";
+      }
+    })
+  }
+
+  setAuthData(data: LoginResult) : void
+  {
+    sessionStorage.setItem("shmooToken", data.access_token);
+    sessionStorage.setItem("fuzzyBear", data.token_type);
+    sessionStorage.setItem("whoDis", data.userName);
+
+    this.cookieService.set("_un", data.userName); // read with this.cookieService.get("_un");
   }
 
   // https://stackoverflow.com/questions/43894565/cast-object-to-interface-in-typescript
@@ -50,7 +63,7 @@ export class LoginComponent implements OnInit {
   //  return obj && typeof obj.access_token === "string";
   //}
 
-  private isLoginError(obj: any): obj is LoginError {
+  private isServiceError(obj: any) : obj is ServiceError {
     return obj && typeof obj.error_description === "string";
   }
 }
