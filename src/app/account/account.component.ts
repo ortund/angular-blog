@@ -11,8 +11,8 @@ export class AccountComponent implements OnInit {
 
   ngOnInit() {
     // Read auth cookie to determine if the user is logged in or not.
-    var authCookie = this.readCookie('_a');
-    if (authCookie == null)
+    var authToken = sessionStorage.getItem("shmooToken");
+    if (authToken == null)
     {
       this.router.navigate(['/login'], { queryParams: { returnUrl: '/account' } });
     }

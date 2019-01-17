@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { BlogService } from '../blog.service';
-import { LoginResult } from '../login-result';
-import { LoginError } from '../login-error';
+import { LoginError } from '../models/login-error';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -24,30 +23,32 @@ export class LoginComponent implements OnInit {
 
   login(emailAddress: string, password: string): void {
     this.blogService.login(emailAddress, password)
-      .subscribe((result: LoginResult | LoginError) => {
-        if (this.isLoginResult(result)) {
+      .subscribe(result => {
+          sessionStorage.setItem("shmooToken", result.access_token);
           if (this.returnUrl != "") {
             this.router.navigate([this.returnUrl]);
           }
-          else
-          {
+          else {
             this.router.navigate(['/']);
           }
+        },
+        (error: any) => {
+          if (this.isLoginError(error))
+          {
+            this.result = error.error_description;
+          }
+          else
+          {
+            this.result = "Invalid user login.";
+          }
         }
-        else if (this.isLoginError(result)) {
-          this.result = result.error_description;
-        }
-        else
-        {
-          this.result = "Unknown login result.";
-        }
-      })
+      )
   }
 
   // https://stackoverflow.com/questions/43894565/cast-object-to-interface-in-typescript
-  private isLoginResult(obj: any): obj is LoginResult {
-    return obj && typeof obj.access_token === "string";
-  }
+  //private isLoginResult(obj: any): obj is LoginResult {
+  //  return obj && typeof obj.access_token === "string";
+  //}
 
   private isLoginError(obj: any): obj is LoginError {
     return obj && typeof obj.error_description === "string";
